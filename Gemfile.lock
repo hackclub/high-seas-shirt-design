@@ -1,0 +1,83 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activesupport (8.0.1)
+      base64
+      benchmark (>= 0.3)
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.3.1)
+      connection_pool (>= 2.2.5)
+      drb
+      i18n (>= 1.6, < 2)
+      logger (>= 1.4.2)
+      minitest (>= 5.1)
+      securerandom (>= 0.3)
+      tzinfo (~> 2.0, >= 2.0.5)
+      uri (>= 0.13.1)
+    base64 (0.2.0)
+    benchmark (0.4.0)
+    bigdecimal (3.1.9)
+    chunky_png (1.4.0)
+    coderay (1.1.3)
+    concurrent-ruby (1.3.5)
+    connection_pool (2.5.0)
+    dotenv (3.1.7)
+    drb (2.2.1)
+    faraday (2.12.2)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-net_http (3.4.0)
+      net-http (>= 0.5.0)
+    faraday-net_http_persistent (2.3.0)
+      faraday (~> 2.5)
+      net-http-persistent (>= 4.0.4, < 5)
+    i18n (1.14.6)
+      concurrent-ruby (~> 1.0)
+    json (2.9.1)
+    logger (1.6.5)
+    matrix (0.4.2)
+    method_source (1.1.0)
+    minitest (5.25.4)
+    net-http (0.6.0)
+      uri
+    net-http-persistent (4.0.5)
+      connection_pool (~> 2.2)
+    norairrecord (0.1.4)
+      faraday (>= 1.0, < 3.0)
+      faraday-net_http_persistent
+      net-http-persistent
+    pdf-core (0.10.0)
+    prawn (2.5.0)
+      matrix (~> 0.4)
+      pdf-core (~> 0.10.0)
+      ttfunk (~> 1.8)
+    pry (0.15.2)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
+    rqrcode (2.2.0)
+      chunky_png (~> 1.0)
+      rqrcode_core (~> 1.0)
+    rqrcode_core (1.2.0)
+    securerandom (0.4.1)
+    ttfunk (1.8.0)
+      bigdecimal (~> 3.1)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+    uri (1.0.2)
+
+PLATFORMS
+  arm64-darwin-24
+  ruby
+
+DEPENDENCIES
+  activesupport
+  dotenv
+  faraday
+  norairrecord
+  prawn
+  pry
+  rqrcode
+
+BUNDLED WITH
+   2.5.11
