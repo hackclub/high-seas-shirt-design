@@ -195,6 +195,12 @@ def shiperize(person)
                 width: QR_SIZE * 2.1
     end
 
+    if page_ships.length > 9
+      pdf.image "./art_1.png",
+                at: [PAGE_WIDTH * 0.6, PAGE_HEIGHT - (QR_SIZE * 3) - 185],
+                width: QR_SIZE * 2.1
+    end
+
     page_ships.each_slice(ITEMS_PER_ROW).with_index do |row_ships, row_index|
       if row_index == 0 || row_index == 3
       generate_qr_row row_ships,
