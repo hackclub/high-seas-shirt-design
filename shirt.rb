@@ -48,16 +48,14 @@ class Ship < Norairrecord::Table
   has_one :entrant, class: 'Person', column: 'entrant'
 end
 
-QR_SIZE = 120
-SPACING = 20
-ITEMS_PER_ROW = 4
+QR_SIZE = 110
+SPACING = 5
+ITEMS_PER_ROW = 3
 ROWS_PER_PAGE = 4
 ITEMS_PER_PAGE = ITEMS_PER_ROW * ROWS_PER_PAGE
 
 PAGE_HEIGHT = 800
 PAGE_WIDTH = 612
-HEADER_HEIGHT = 120
-LEFT_MARGIN = 5
 
 def shiperize(person)
 
@@ -76,45 +74,30 @@ def shiperize(person)
     end
   end.values
 
-  ships.reject! { |ship| ship['hours'] == 0 || ship['deploy_url'].blank? }
+  ships.reject! { |ship|
+    ship['hours'] == 0 ||
+    ship['deploy_url'].blank? ||
+    ship['doubloons'] == 0
+  }
   puts "Shiperizing #{person.nice_full_name}"
 
   handle = get_username(person['slack_id'])
 
-  ships.each_slice(ITEMS_PER_PAGE).with_index do |page_ships, page_index|
-    pdf = Prawn::Document.new(page_size: [PAGE_WIDTH, PAGE_HEIGHT])
-
-    pdf.font_families.update(
-      "bank_printer" => {
-        normal: 'F25_Bank_Printer.ttf',
-        bold: 'F25_Bank_Printer_Bold.ttf',
-      }
-    )
-
-    pdf.font "bank_printer"
-
-    pdf.canvas do
-      pdf.fill_color "000000"
-      pdf.fill_rectangle [pdf.bounds.left, pdf.bounds.top], pdf.bounds.right, pdf.bounds.top
+  def generate_qr_row(ships, x, y, align=:left, pdf)
+    ships.each_with_index do |ship, index|
+      shifted_x = QR_SIZE * (index + (align == :left ? 0 : 2))
+      generate_qr(ship, shifted_x, y, pdf)
     end
-    pdf.fill_color 'FFFFFF'
+  end
 
-    page_ships.each_with_index do |ship, index|
-
-      row = index / ITEMS_PER_ROW
-      col = index % ITEMS_PER_ROW
-
-      x_position = LEFT_MARGIN + (col * (QR_SIZE + SPACING))
-      y_position = PAGE_HEIGHT - (HEADER_HEIGHT + (row * (QR_SIZE + SPACING + 40)))
-
+  def generate_qr(ship, x, y, pdf)
       qr = RQRCode::QRCode.new(ship['deploy_url'])
       png = qr.as_png(
         bit_depth: 1,
-        border_modules: 2,
         color_mode: ChunkyPNG::COLOR_GRAYSCALE,
-        color: 'white',
+        color: 'black',
+        fill: '00000000',
         file: nil,
-        fill: 'black',
         module_px_size: 4,
         resize_exactly_to: false,
         resize_gte_to: false,
@@ -123,18 +106,18 @@ def shiperize(person)
       qr_path = "#{Digest::MD5.hexdigest(ship['title'].downcase)}_qr.png"
       png.save(qr_path)
 
-      pdf.image qr_path, at: [x_position, y_position], width: QR_SIZE
+      pdf.image qr_path, at: [x, y], width: QR_SIZE
 
       pdf.text_box ship['title'],
-                   at: [x_position, y_position - QR_SIZE - 5],
+                   at: [x, y - QR_SIZE - 5],
                    width: QR_SIZE,
                    height: 20,
                    align: :center,
                    size: 10,
                    overflow: :shrink_to_fit
 
-      x_center = x_position + (QR_SIZE / 2)
-      stats_y = y_position - QR_SIZE - 25
+      x_center = x + (QR_SIZE / 2)
+      stats_y = y - QR_SIZE - 25
 
       content = ""
       content_width = 0
@@ -173,6 +156,60 @@ def shiperize(person)
       end
 
       File.delete(qr_path)
+  end
+
+  ships.each_slice(ITEMS_PER_PAGE).with_index do |page_ships, page_index|
+    puts "page #{page_index + 1}"
+    pdf = Prawn::Document.new(page_size: [PAGE_WIDTH, PAGE_HEIGHT])
+
+    pdf.font_families.update(
+      "bank_printer" => {
+        normal: 'F25_Bank_Printer.ttf',
+        bold: 'F25_Bank_Printer_Bold.ttf',
+      }
+    )
+
+    pdf.font "bank_printer"
+
+    #  while testing, fill with blue background
+    pdf.canvas do
+      pdf.fill_color "D2E6FF"
+      pdf.fill_rectangle [pdf.bounds.left, pdf.bounds.top], pdf.bounds.right, pdf.bounds.top
+    end
+    pdf.fill_color '000000'
+
+    pdf.text_box "@#{handle} - projects",
+                  at: [PAGE_WIDTH * 0.05, PAGE_HEIGHT - 90],
+                  height: 40,
+                  width: PAGE_WIDTH * 0.5,
+                  align: :left,
+                  size: 30,
+                  overflow: :shrink_to_fit
+
+    pdf.image "./art_2.png",
+              at: [PAGE_WIDTH * 0.6, PAGE_HEIGHT - 30],
+              width: PAGE_WIDTH * 0.3
+    if page_ships.length > 6
+      pdf.image "./art_3.png",
+                at: [-20, PAGE_HEIGHT - QR_SIZE - 170],
+                width: QR_SIZE * 2.1
+    end
+
+    page_ships.each_slice(ITEMS_PER_ROW).with_index do |row_ships, row_index|
+      if row_index == 0 || row_index == 3
+      generate_qr_row row_ships,
+                      0,
+                      PAGE_HEIGHT - QR_SIZE - (row_index * (QR_SIZE + SPACING + 40)),
+                      :left,
+                      pdf
+      end
+      if row_index == 1 || row_index == 2
+      generate_qr_row row_ships,
+                      QR_SIZE * 2.1,
+                      PAGE_HEIGHT - QR_SIZE - (row_index * (QR_SIZE + SPACING + 40)),
+                      :right,
+                      pdf
+      end
     end
 
     pdf_filename = "./output/#{person.nice_full_name.downcase.gsub(' ', '_')}_shirt_#{page_index + 1}.pdf"
