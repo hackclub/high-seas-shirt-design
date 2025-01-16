@@ -175,7 +175,7 @@ def shiperize(person)
       File.delete(qr_path)
     end
 
-    pdf_filename = "#{person.nice_full_name.downcase.gsub(' ', '_')}_shirt_#{page_index + 1}.pdf"
+    pdf_filename = "./output/#{person.nice_full_name.downcase.gsub(' ', '_')}_shirt_#{page_index + 1}.pdf"
     png_filename = pdf_filename.sub('.pdf', '.png')
     pdf.render_file(pdf_filename)
     system("magick -density 300 #{pdf_filename} -quality 100 #{png_filename}")
