@@ -178,7 +178,7 @@ def shiperize(person)
     pdf_filename = "./output/#{person.nice_full_name.downcase.gsub(' ', '_')}_shirt_#{page_index + 1}.pdf"
     png_filename = pdf_filename.sub('.pdf', '.png')
     pdf.render_file(pdf_filename)
-    system("magick -density 300 #{pdf_filename} -quality 100 #{png_filename}")
+    system("magick -density 600 #{pdf_filename} -quality 100 #{png_filename}")
     File.delete(pdf_filename)
     puts "Generated shirt PNG page #{page_index + 1}: #{png_filename}"
   end
