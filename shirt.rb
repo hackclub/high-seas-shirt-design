@@ -58,7 +58,7 @@ PAGE_HEIGHT = 800
 PAGE_WIDTH = 612
 
 def shiperize(person)
-
+  png_filez = []
   ships = person.ships.each_with_object({}) do |ship, acc|
     title = ship['title'].gsub('–', '-').split('-').first
     if acc[title]
@@ -111,7 +111,7 @@ def shiperize(person)
       pdf.text_box ship['title'],
                    at: [x, y - QR_SIZE + 2],
                    width: QR_SIZE,
-                   height: 15,
+                   height: 10,
                    align: :center,
                    size: 10,
                    overflow: :shrink_to_fit
@@ -178,10 +178,10 @@ def shiperize(person)
     end
     pdf.fill_color '000000'
 
-    pdf.text_box "@#{handle} - projects",
+    pdf.text_box "@#{handle} - #{'project'.pluralize(ships.length)}",
                   at: [PAGE_WIDTH * 0.05, PAGE_HEIGHT - 90],
                   height: 40,
-                  width: PAGE_WIDTH * 0.5,
+                  width: PAGE_WIDTH * 0.4,
                   align: :left,
                   size: 30,
                   overflow: :shrink_to_fit
@@ -224,9 +224,13 @@ def shiperize(person)
     system("magick -density 600 #{pdf_filename} -quality 100 #{png_filename}")
     File.delete(pdf_filename)
     puts "Generated shirt PNG page #{page_index + 1}: #{png_filename}"
+    png_filez << png_filename
   end
+  png_filez
 end
 
-person = Person.records(max_records: 1, filter: "slack_id = '#{ARGV[0]}'").first
+if __FILE__ == $PROGRAM_NAME
+  person = Person.records(max_records: 1, filter: "slack_id = '#{ARGV[0]}'").first
 
-shiperize(person)
+  shiperize(person)
+end
