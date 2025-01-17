@@ -109,15 +109,15 @@ def shiperize(person)
       pdf.image qr_path, at: [x, y], width: QR_SIZE
 
       pdf.text_box ship['title'],
-                   at: [x, y - QR_SIZE - 5],
+                   at: [x, y - QR_SIZE + 2],
                    width: QR_SIZE,
-                   height: 20,
+                   height: 15,
                    align: :center,
                    size: 10,
                    overflow: :shrink_to_fit
 
       x_center = x + (QR_SIZE / 2)
-      stats_y = y - QR_SIZE - 25
+      stats_y = y - QR_SIZE - 15
 
       content = ""
       content_width = 0
@@ -186,36 +186,36 @@ def shiperize(person)
                   size: 30,
                   overflow: :shrink_to_fit
 
+    page_ships.each_slice(ITEMS_PER_ROW).with_index do |row_ships, row_index|
+      if row_index == 0 || row_index == 3
+        generate_qr_row row_ships,
+                        0,
+                        PAGE_HEIGHT - QR_SIZE - (row_index * (QR_SIZE + SPACING + 20)),
+                        :left,
+                        pdf
+      end
+      if row_index == 1 || row_index == 2
+        generate_qr_row row_ships,
+                        QR_SIZE * 2.1,
+                        PAGE_HEIGHT - QR_SIZE - (row_index * (QR_SIZE + SPACING + 20)),
+                        :right,
+                        pdf
+      end
+    end
+
     pdf.image "./art_2.png",
-              at: [PAGE_WIDTH * 0.6, PAGE_HEIGHT - 30],
-              width: PAGE_WIDTH * 0.3
+              at: [PAGE_WIDTH * 0.5 + 10, PAGE_HEIGHT - 40],
+              width: PAGE_WIDTH * 0.33
     if page_ships.length > 6
       pdf.image "./art_3.png",
                 at: [-20, PAGE_HEIGHT - QR_SIZE - 170],
-                width: QR_SIZE * 2.1
+                width: QR_SIZE * 2.2
     end
 
     if page_ships.length > 9
       pdf.image "./art_1.png",
                 at: [PAGE_WIDTH * 0.6, PAGE_HEIGHT - (QR_SIZE * 3) - 185],
                 width: QR_SIZE * 2.1
-    end
-
-    page_ships.each_slice(ITEMS_PER_ROW).with_index do |row_ships, row_index|
-      if row_index == 0 || row_index == 3
-      generate_qr_row row_ships,
-                      0,
-                      PAGE_HEIGHT - QR_SIZE - (row_index * (QR_SIZE + SPACING + 40)),
-                      :left,
-                      pdf
-      end
-      if row_index == 1 || row_index == 2
-      generate_qr_row row_ships,
-                      QR_SIZE * 2.1,
-                      PAGE_HEIGHT - QR_SIZE - (row_index * (QR_SIZE + SPACING + 40)),
-                      :right,
-                      pdf
-      end
     end
 
     pdf_filename = "./output/#{person.nice_full_name.downcase.gsub(' ', '_')}_shirt_#{page_index + 1}.pdf"
