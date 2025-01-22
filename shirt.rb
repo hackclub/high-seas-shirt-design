@@ -149,7 +149,7 @@ def shiperize(person)
                    overflow: :shrink_to_fit
 
       x_center = x + (size / 2)
-      stats_y = y - size - 15
+      stats_y = y - size - (font_size+5)
 
       content = ""
       content_width = 0
