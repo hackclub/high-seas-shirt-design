@@ -17,7 +17,7 @@ end
 
 def render_shirt_and_add_to_at(person)
   shirts = generate_shirts(person)
-  if shirts.any?
+  unless shirts.blank?
     person['shirt_design'] = shirts.map.with_index do |shirt, i|
       { url: bucky(shirt, "#{person.id}_#{i}.png") }
     end
