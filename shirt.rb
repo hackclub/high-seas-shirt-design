@@ -255,7 +255,7 @@ def shiperize(person)
       end
       end
 
-    pdf_filename = "/tmp/#{person.nice_full_name.downcase.gsub(' ', '_')}_shirt_#{page_index + 1}.pdf"
+    pdf_filename = "/tmp/#{person.id}_shirt_#{page_index + 1}.pdf"
     png_filename = pdf_filename.sub('.pdf', '.png')
     pdf.render_file(pdf_filename)
     system("magick -density 600 #{pdf_filename} -quality 100 #{png_filename}")
