@@ -22,6 +22,7 @@ def single_shirt(person)
   end
 
   person['shirt_design'] = shirt_filez.map { |shirt| { url: bucky(shirt) } }
+  person['action_generate_shirt_design'] = nil
   person.save
 end
 def run_batch
