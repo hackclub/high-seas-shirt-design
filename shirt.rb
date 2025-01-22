@@ -87,7 +87,7 @@ ARTS = {
 def shiperize(person)
   png_filez = []
   ships = person.ships.each_with_object({}) do |ship, acc|
-    title = ship['title'].gsub('–', '-').split('-').first
+    title = ship['title'].gsub('–', '-').gsub(':','-').split('-').first
     if acc[title]
       acc[title]['doubloons'] += ship['doubloon_payout_adjusted'] || 0
       acc[title]['hours'] += ship['total_hours'] || 0
