@@ -115,11 +115,12 @@ def process_ships(person)
     end
   end.values
 
-  ships.reject { |ship|
+  ships.reject! { |ship|
     ship[:hours] == 0 ||
       ship[:deploy_url].blank? ||
       ship[:doubloons] == 0
   }
+  ships.sort_by { |ship| -ship[:doubloons] }
 end
 
 def generate_shirts(person)
