@@ -18,6 +18,8 @@ def single_shirt(person)
   puts person['slack_id']
   if shirt_filez.empty?
     puts "\tno shirt?"
+    person['action_generate_shirt_design'] = nil
+    person.save
     return
   end
 
