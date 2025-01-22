@@ -11,6 +11,8 @@ require 'grover'
 
 include ActiveSupport::NumberHelper
 
+ONLY_YSWS_PROJECTS = true
+
 Grover.configure do |config|
   # n.b.: this is bad!
   # make sure you sanitize stuff coming from airtable :-P
@@ -116,9 +118,10 @@ def process_ships(person)
   end.values
 
   ships.reject! { |ship|
-    ship[:hours] == 0 ||
+      ship[:hours] == 0 ||
       ship[:deploy_url].blank? ||
-      ship[:doubloons] == 0
+      ship[:doubloons] == 0 ||
+      (ONLY_YSWS_PROJECTS and not ship[:in_ysws])
   }
   ships.sort_by { |ship| -ship[:doubloons] }
 end
