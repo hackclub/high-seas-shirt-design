@@ -8,18 +8,25 @@ require 'active_support/number_helper'
 require 'norairrecord'
 require 'base64'
 require 'grover'
+require 'faraday'
 
 include ActiveSupport::NumberHelper
 
 ONLY_YSWS_PROJECTS = true
+
+BROWSER = '127.0.0.1:9222'
+
+# 🤢🤢🤮
+browser_ws_endpoint = !ENV['USE_PUPPS_CHROMIUM'] && JSON.parse(Faraday.new("http://#{BROWSER}").get('/json/version').body)['webSocketDebuggerUrl']
 
 Grover.configure do |config|
   # n.b.: this is bad!
   # make sure you sanitize stuff coming from airtable :-P
   config.allow_file_uris = true
   config.options = {
-    launch_args: %w[--disable-gpu --no-sandbox]
-  }
+    launch_args: %w[--disable-gpu --no-sandbox],
+    browser_ws_endpoint:
+  }.compact
 end
 
 def setup_files
