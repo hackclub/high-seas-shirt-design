@@ -39,6 +39,7 @@ ROWS_PER_SHIRT = 5
 ITEMS_PER_SHIRT = ITEMS_PER_ROW * ROWS_PER_SHIRT
 
 Norairrecord.api_key = ENV["AIRTABLE_PAT"]
+Norairrecord.base_url = ENV["AIRTABLE_ENDPOINT_URL"] if ENV['AIRTABLE_ENDPOINT_URL']
 
 class Person < Norairrecord::Table
   self.base_key = "appTeNFYcUiYfGcR6"
