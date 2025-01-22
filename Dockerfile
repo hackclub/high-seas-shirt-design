@@ -7,6 +7,9 @@ WORKDIR /code
 COPY Gemfile Gemfile.lock package.json /code/
 RUN bundle install; npm install
 
+RUN apk add chromium ttf-freefont udev
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
 COPY . /code
 
 EXPOSE 42069
