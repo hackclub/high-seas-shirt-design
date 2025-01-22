@@ -1,9 +1,9 @@
 FROM ruby:3.3.6-alpine
 
+RUN apk add --update nodejs npm build-base
+
 WORKDIR /code
 COPY . /code
-
-RUN apk add --update nodejs npm build-base
 
 RUN bundle install
 
