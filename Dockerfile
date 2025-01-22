@@ -4,8 +4,8 @@ RUN apk add --update nodejs npm build-base
 
 WORKDIR /code
 
-COPY Gemfile Gemfile.lock /code/
-RUN bundle install
+COPY Gemfile Gemfile.lock package.json /code/
+RUN bundle install; npm install
 
 COPY . /code
 
