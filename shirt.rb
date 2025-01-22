@@ -7,6 +7,7 @@ require 'faraday'
 require 'active_support'
 require 'active_support/number_helper'
 require 'active_support/core_ext'
+require 'stringio'
 
 include ActiveSupport::NumberHelper
 
@@ -103,10 +104,7 @@ def shiperize(person)
         resize_gte_to: false,
       )
 
-      qr_path = "#{Digest::MD5.hexdigest(ship['title'].downcase)}_qr.png"
-      png.save(qr_path)
-
-      pdf.image qr_path, at: [x, y], width: QR_SIZE
+      pdf.image StringIO.new(png.to_blob), at: [x, y], width: QR_SIZE
 
       pdf.text_box ship['title'],
                    at: [x, y - QR_SIZE + 2],
