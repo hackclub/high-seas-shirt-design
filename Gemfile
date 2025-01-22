@@ -12,3 +12,5 @@ gem "pry"
 gem "faraday"
 gem "activesupport"
 gem "faraday-multipart", "~> 1.1"
+
+gem "puma", "~> 6.5"

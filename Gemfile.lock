@@ -46,6 +46,7 @@ GEM
       uri
     net-http-persistent (4.0.5)
       connection_pool (~> 2.2)
+    nio4r (2.7.4)
     norairrecord (0.1.4)
       faraday (>= 1.0, < 3.0)
       faraday-net_http_persistent
@@ -58,6 +59,8 @@ GEM
     pry (0.15.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    puma (6.5.0)
+      nio4r (~> 2.0)
     rqrcode (2.2.0)
       chunky_png (~> 1.0)
       rqrcode_core (~> 1.0)
@@ -81,7 +84,8 @@ DEPENDENCIES
   norairrecord
   prawn
   pry
+  puma (~> 6.5)
   rqrcode
 
 BUNDLED WITH
-   2.5.11
+   2.5.22
