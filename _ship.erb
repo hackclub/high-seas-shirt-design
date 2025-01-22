@@ -1,0 +1,14 @@
+<div class="qr-card <%= ship[:in_ysws] && 'in-ysws' %>">
+  <img class="qr-code" src="<%= generate_qr_data_uri(ship[:deploy_url]) %>">
+  <div class="ship-title" data-width="450"><span class="shrink-to-fit"><%= ship[:title] %></span></div>
+  <div class="stats">
+    <span>
+    <% if ship[:hours] %>
+      <%= number_to_rounded(ship[:hours], precision: 1, strip_insignificant_zeros: true) %>h /
+    <% end %>
+    <% if ship[:doubloons] %>
+      <%= ship[:doubloons].to_i %><img class="doubloon-icon" src="images/doubloon.png" alt="doubloons">
+    <% end %>
+    </span>
+  </div>
+</div>

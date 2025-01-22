@@ -2,21 +2,21 @@
 
 source "https://rubygems.org"
 
-ruby "3.3.6"
+# gem "rails"
 
-git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
+gem "norairrecord", "~> 0.1.4"
 
-gem "norairrecord"
-gem "dotenv"
-gem "rqrcode"
-gem "prawn"
-gem "pry"
-gem "faraday"
-gem "activesupport"
+gem "tilt", "~> 2.6"
+
+gem "faraday", "~> 2.12"
 gem "faraday-multipart", "~> 1.1"
 
-gem "puma", "~> 6.5"
+gem "rqrcode", "~> 2.2"
+
+gem "activesupport", "~> 8.0"
+
+gem "grover", "~> 1.2"
 
 gem "rackup", "~> 2.2"
-
-gem "rack", "~> 3.1"
+gem "puma", "~> 6.5"
+gem "grape", "~> 2.2"

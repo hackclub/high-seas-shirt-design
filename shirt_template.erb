@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+      @font-face {
+          font-family: 'Bank Printer';
+          src: url('fonts/F25_Bank_Printer.ttf') format('truetype');
+      }
+
+      body {
+          /*background-color: #D2E6FF;*/
+          font-family: 'Bank Printer', monospace;
+          margin: 0;
+          padding: 20px;
+      }
+
+      .container {
+          width: 800px;
+          height: 820px;
+      }
+
+      .header {
+          margin: 40px 30px;
+      }
+
+      .qr-card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          width: 170px;
+      }
+
+      .qr-code {
+          width: 180px
+      }
+
+      .doubloon-icon {
+          height: 17px;
+          display: inline-block;
+          vertical-align: middle;
+          margin-top: -3px;
+      }
+
+      .container {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+          grid-template-rows: 0.3fr repeat(auto-fit, 1fr);
+          align-items: center;
+          gap: 8px 8px;
+          grid-template-areas:
+    "title title title art1 art1 "
+    ". . . art1 art1"
+    "art2 art2 . . ."
+    "art2 art2 . . ."
+    ". . . art3 art3"
+    ". . . art3 art3";
+      }
+
+      .shrink-to-fit {
+          white-space: nowrap;
+      }
+
+      .title {
+          grid-area: title;
+          font-size: 40px;
+          justify-self: center;
+      }
+
+      .ship-title {
+          width: 150px;
+      }
+
+
+      .art1 {
+          grid-area: art1;
+          align-self: end;
+      <%= v1_rotaté %>
+      }
+
+      .art2 {
+          grid-area: art2;
+      <%= v1_rotaté %>
+      }
+
+      .art3 {
+          grid-area: art3;
+      <%= v1_rotaté %>
+      }
+
+      .art {
+          vertical-align: middle;
+      }
+
+      .in-ysws {
+          border: 1.5px solid gold;
+          background: #FFFCEB;
+          border-radius: 14px;
+      }
+  </style>
+</head>
+<body style="zoom: 300%">
+
+<div class="container">
+  <div class="title shrink-to-fit">
+    <span><%= shirt.handle %> – <%= 'project'.pluralize(ships.length) %></span>
+  </div>
+  <div class="art art1"><img src="images/art_2.png" width="300px"></div>
+  <% if shirt.ships.length > 3 %>
+    <div class="art art2"><img src="images/art_3.png" width="300px"></div>
+  <% end %>
+  <% if shirt.ships.length > 9 %>
+    <div class="art art3"><img src="images/art_1.png" width="320px"></div>
+  <% end %>
+  <% case shirt.ships.length
+     when 1 %>
+    <div style="grid-area: 2 / 1 / 3 / 4; align-self: center; justify-self: center;">
+    <%= erb '_ship.erb', locals: { ship: shirt.ships.first } %>
+    </div>
+    <% when 2 %>
+    <div style="grid-area: 1 / 1 / 5 / 1; align-self: center; justify-self: center;">
+      <%= erb '_ship.erb', locals: { ship: shirt.ships.first } %>
+    </div>
+    <div style="grid-area: 1 / 3 / 5 / 3; align-self: center; justify-self: center;">
+      <%= erb '_ship.erb', locals: { ship: shirt.ships.last } %>
+    </div>
+    <% else %>
+    <% shirt.ships.each do |ship| %>
+      <%= erb '_ship.erb', locals: { ship: } %>
+    <% end %>
+<% end %>
+
+</div>
+<script>
+    // The poor man's jQuery
+    window.$ = (query, el = document) => {
+        return el.querySelector(query);
+    };
+    window.$all = (query, el = document) => {
+        return [...el.querySelectorAll(query)];
+    };
+</script>
+<script>
+    for (const element of $all('.shrink-to-fit')) {
+        console.log('awa')
+        var size = parseInt(getComputedStyle(element).getPropertyValue('font-size'));
+        const parent_width = element.parentElement.dataset.width
+        // if you ask me why it's 14.15 i'm legally allowed to come to your house and cry at you
+        while (element.getBoundingClientRect().width > parent_width - 14.15) {
+            element.style.fontSize = size + "px"
+            size -= 0.5
+        }
+    }
+</script>
+</body>
+</html>
