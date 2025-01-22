@@ -15,6 +15,9 @@ Grover.configure do |config|
   # n.b.: this is bad!
   # make sure you sanitize stuff coming from airtable :-P
   config.allow_file_uris = true
+  config.options = {
+    launch_args: %w[--disable-gpu --no-sandbox]
+  }
 end
 
 def setup_files
