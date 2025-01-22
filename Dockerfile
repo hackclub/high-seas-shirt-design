@@ -9,6 +9,7 @@ RUN bundle install; npm install
 
 RUN apk add chromium ttf-freefont udev
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV WEB_CONCURRENCY=auto
 
 COPY . /code
 
