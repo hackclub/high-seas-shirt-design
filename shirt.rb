@@ -26,7 +26,9 @@ end
 
 def get_username(slack_id)
   user_info = get_slack_user_info(slack_id)
-  user_info.dig('user', 'profile', 'display_name')
+  display_name = user_info.dig('user', 'profile', 'display_name')
+  return "@#{display_name}" if display_name
+  user_info.dig('user', 'profile', 'first_name')
 end
 
 Norairrecord.api_key = ENV["AIRTABLE_PAT"]
@@ -212,14 +214,14 @@ def shiperize(person)
     pdf.fill_color '000000'
 
 
-    pdf.text_box "@#{handle} - #{'project'.pluralize(ships.length)}",
+    pdf.text_box "#{handle} - #{'project'.pluralize(ships.length)}",
                  at: [PAGE_WIDTH * 0.05, PAGE_HEIGHT - 90],
                  height: 30,
                  width: ((QR_SIZE + SPACING) * 3) - (PAGE_WIDTH * 0.15),
                  # ^ number 100% pulled out of ass ^
                  align: :left,
                  size: 30,
-                 min_font_size: 8,
+                 min_font_size: 3,
                  overflow: :shrink_to_fit
 
 
