@@ -59,6 +59,8 @@
 
       .shrink-to-fit {
           white-space: nowrap;
+          transform: scale(1);
+          transform-origin: left;
       }
 
       .title {
@@ -102,8 +104,8 @@
 <body style="zoom: 300%">
 
 <div class="container">
-  <div class="title shrink-to-fit">
-    <span><%= shirt.handle %> – <%= 'project'.pluralize(ships.length) %></span>
+  <div data-width="1400">
+    <span class="shrink-to-fit title"><%= shirt.handle %> – <%= 'project'.pluralize(ships.length) %></span>
   </div>
   <div class="art art1"><img src="images/art_2.png" width="300px"></div>
   <% if shirt.ships.length > 3 %>
