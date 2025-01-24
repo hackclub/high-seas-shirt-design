@@ -4,7 +4,7 @@ source "https://rubygems.org"
 
 # gem "rails"
 
-gem "norairrecord", "~> 0.1.4"
+gem "norairrecord", "~> 0.2.0"
 
 gem "tilt", "~> 2.6"
 
@@ -22,3 +22,7 @@ gem "puma", "~> 6.5"
 gem "grape", "~> 2.2"
 
 gem "concurrent-ruby", "~> 1.3"
+
+gem "faraday-mashify", "~> 0.1.1"
+
+gem "printfulrb", "~> 0.1.0"
