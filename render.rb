@@ -5,10 +5,11 @@ require 'active_support'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/string'
 require 'active_support/number_helper'
-require 'norairrecord'
 require 'base64'
 require 'grover'
 require 'faraday'
+
+require_relative './models'
 
 include ActiveSupport::NumberHelper
 
@@ -44,27 +45,6 @@ end
 ITEMS_PER_ROW = 3
 ROWS_PER_SHIRT = 5
 ITEMS_PER_SHIRT = ITEMS_PER_ROW * ROWS_PER_SHIRT
-
-Norairrecord.api_key = ENV["AIRTABLE_PAT"]
-Norairrecord.base_url = ENV["AIRTABLE_ENDPOINT_URL"] if ENV['AIRTABLE_ENDPOINT_URL']
-
-class Person < Norairrecord::Table
-  self.base_key = "appTeNFYcUiYfGcR6"
-  self.table_name = 'tblfTzYVqvDJlIYUB' # 'people'
-
-  has_many :ships, class: 'Ship', column: 'ships'
-
-  def nice_full_name
-    "#{self["first_name"].first} #{self["last_name"].first}"
-  end
-end
-
-class Ship < Norairrecord::Table
-  self.base_key = "appTeNFYcUiYfGcR6"
-  self.table_name = 'tblHeGZNG00d4GBBV' # 'ships'
-
-  has_one :entrant, class: 'Person', column: 'entrant'
-end
 
 class Shirt
   attr_reader :ships, :handle
@@ -153,7 +133,7 @@ def generate_shirts(person)
                        full_page: true,
                        viewport: {
                          width: 2700,
-                         height: 3000,
+                         height: 3773,
                        },
                        omit_background: true
     ).to_png
@@ -169,7 +149,7 @@ if __FILE__ == $PROGRAM_NAME
   person = Person.records(max_records: 1, filter: "slack_id = '#{ARGV[0]}'").first
   shirts = generate_shirts(person)
 
-  shirts.each_with_index do |shirt, i|
+  shirts&.each_with_index do |shirt, i|
     File.open("#{i}.png", 'wb') { |f| f << shirt }
   end
 end

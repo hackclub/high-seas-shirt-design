@@ -26,3 +26,5 @@ gem "concurrent-ruby", "~> 1.3"
 gem "faraday-mashify", "~> 0.1.1"
 
 gem "printfulrb", "~> 0.1.0"
+
+gem "countries", "~> 7.1"
