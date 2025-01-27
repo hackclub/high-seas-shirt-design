@@ -28,3 +28,5 @@ gem "faraday-mashify", "~> 0.1.1"
 gem "printfulrb", "~> 0.1.0"
 
 gem "countries", "~> 7.1"
+
+gem "builder", "~> 3.3"
