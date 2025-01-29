@@ -91,20 +91,22 @@ class MockTavern
   }
 
   def initialize
-    @people = Person.where "slack_id='U06QK6AG3RD'"
-    # @people = [
-    #   {
-    #       'first_name' => ['Nora'],
-    #       'shirt_size'=>'Medium',
-    #       'shirt_design' => [{'url'=> 'https://v5.airtableusercontent.com/v3/u/37/37/1737770400000/tqagBefBWQLl9IfzeUtQDA/AlhvR9kgadO944YFrGTAuE6H0W9o4o9GqnMDDrW-SkyM6LA7SB_f2Lh-T7uAcY_aUQHGjW2ENhD5TVOudN9JrH5bgLlLBbU0976fFujrSl4fqtb1lhDg2DWLSa6Sw895Wbw_eEX4nGiBBYNKyFnEEg/odyIf49aKMFPA1Pg9nvOwYYP66jRwOQj85ex_ekS9Ak'}]
-    #   }
-    # ]
+    # @people = Person.where "slack_id='U0807ADEC6L'"
+    @people = [
+      {
+          'first_name' => ['Manan'],
+          'shirt_size'=>'Medium',
+          'shirt_design' => [{'url'=> 'https://v5.airtableusercontent.com/v3/u/37/37/1738008000000/hJE8Vef9g-m4Z-xfmcMytw/QRBP4WeiTjqk3mu3A-J2ab4ZP4AAdQXlalVa8QmCB4PXsfdcGonhLFRnsaTSQUCuWWZdXU5qgpuFp5jse486_CGQeKaLw48rDkV2cbL2_xeQ9FgPWPIYScFdW2LdgPNQvBg6K9uSuLJT3jI_u9JRgQ/KrV-OU8G-o7UYpsencgM0Z-CX_x-1swQEzszqwjd9KA'}]
+      }
+    ]
   end
 
   attr_accessor :people
 
   def id
-    "recFAKE#{rand(10000)}#{rand(10000)}"
+    @id ||= "recFAKE#{rand(10000)}#{rand(10000)}"
+    puts @id
+    @id
   end
 
   def [](key)
@@ -118,6 +120,9 @@ def generate_order(tavern, expedited: false)
   raise "no address?" unless tavern['shirt_delivery_address']
   country_and_state(tavern['addr_country'], tavern['addr_state']) => { country_code:, state_code: }
   items = tavern.people.flat_map { |person| generate_shirt_items(person) }.compact
+  gift = generate_gift_info(tavern)
+  packing_slip = generate_packing_slip_info(tavern)
+  puts "all the shit been generated ^w^"
   {
     external_id: tavern.id.gsub('rec', 'Tavern.'),
     shipping: expedited ? 'PRINTFUL_FAST' : 'STANDARD',
@@ -126,8 +131,8 @@ def generate_order(tavern, expedited: false)
       currency: 'USD',
       subtotal: items.length * 5
     },
-    gift: generate_gift_info(tavern),
-    packing_slip: generate_packing_slip_info(tavern),
+    gift:,
+    packing_slip:,
     recipient: {
       name: "#{tavern['addr_first_name']} #{tavern['addr_last_name']}",
       address1: tavern['addr_line_1'],
@@ -139,18 +144,29 @@ def generate_order(tavern, expedited: false)
       country_name: tavern['addr_country'],
       country_code:,
       email: tavern['addr_email'],
-    }
+    },
+    confirm: true
   }
 end
 
+# lol countries can't find subdivisions by unofficial names
 module ISO3166
   module CountrySubdivisionMethods
     def find_subdivision_by_any_name(subdivision_str)
       subdivisions.select do |k, v|
-        subdivision_str == k || v.name == subdivision_str || v.translations.values.include?(subdivision_str) || v.unofficial_names.include?(subdivision_str)
+        subdivision_str == k || v.name == subdivision_str || v.translations&.values.include?(subdivision_str) || v.unofficial_names&.include?(subdivision_str)
       end.values.first
     end
   end
+end
+
+# lol printfulrb can't pass url params
+module Printful
+  class OrdersResource
+    def create(**params)
+      response = post_request("orders#{'?confirm=true' if params.delete(:confirm)}", body: params)
+      Order.new(response.body["result"])
+    end  end
 end
 
 def country_and_state(country, state)
