@@ -130,7 +130,7 @@ def generate_shirts(person)
     puts "wrote #{html_filename}..."
 
     pngs << Grover.new("file://#{html_filename}",
-                       full_page: true,
+                       full_page: false,
                        viewport: {
                          width: 2700,
                          height: 3773,
