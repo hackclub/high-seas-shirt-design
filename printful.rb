@@ -1,6 +1,21 @@
 require 'printfulrb'
 require 'countries'
 require_relative './models'
+require 'active_support/inflector'
+
+I18n.backend.store_translations(:en, i18n: {
+  transliterate: {
+    rule: {
+      'ș' => 's',
+      'Т' => 'T',
+      'о' => 'o',
+      'Ț' => 'T',
+      '–' => '-',
+      'ț' => 't',
+      'Ș' => 'S'
+    }
+  }
+})
 
 SIZE_MAPPING = {
   'Small' => 17648,
@@ -27,20 +42,21 @@ def generate_packing_slip_info(tavern)
   {
     email: 'nora+tavern@hackclub.com',
     phone: '+1 (802) 266-0668',
-    message: 'yarr har fiddle-dee-dee',
-    logo_url: 'https://cloud-6zfowgva5-hack-club-bot.vercel.app/0highseaslogo.png',
+    message: '🏴‍☠️',
+    logo_url: 'https://cloud-qbqw0pyux-hack-club-bot.vercel.app/0image.png',
+    store_name: "Hack Club"
   }
 end
 
 def generate_shirt_items(person)
   variant_id = size_to_variant(person['shirt_size'])
   shirt_designs = person['shirt_design']&.map { |img| img['url'] }
-  shirt_designs&.map.with_index do |url, index|
+  shirt_designs&.map&.with_index do |url, index|
     {
       variant_id:,
       quantity: 1,
-      retail_price: '$5',
-      name: "#{person['first_name'].first}'s shirt!#{"#{index + 1} of #{shirt_designs.length}" unless shirt_designs.length == 1}",
+      retail_price: 5,
+      name: "#{person['first_name'].first}'s shirt! #{"(#{index + 1} of #{shirt_designs.length})" unless shirt_designs.length == 1}",
       files: [
         {
           # id: 788034101, # High Seas logo
@@ -64,7 +80,7 @@ def generate_shirt_items(person)
           position: {
             areaWidth: 1800,
             areaHeight: 2400,
-            width: 1752,
+            width: 1717,
             height: 2400,
             top: 0,
             left: 0,
@@ -118,8 +134,10 @@ class WhatCountryError < StandardError; end
 
 def generate_order(tavern, expedited: false)
   raise "no address?" unless tavern['shirt_delivery_address']
-  country_and_state(tavern['addr_country'], tavern['addr_state']) => { country_code:, state_code: }
+  country_and_state(tavern['addr_country'].first&.strip, tavern['addr_state'].first&.strip) => { country_code:, state_code: }
+  raise "this is literally one guy" if tavern.people.one?
   items = tavern.people.flat_map { |person| generate_shirt_items(person) }.compact
+  raise "nobody here shipped something" unless items.any?
   gift = generate_gift_info(tavern)
   packing_slip = generate_packing_slip_info(tavern)
   puts "all the shit been generated ^w^"
@@ -134,17 +152,17 @@ def generate_order(tavern, expedited: false)
     gift:,
     packing_slip:,
     recipient: {
-      name: "#{tavern['addr_first_name']} #{tavern['addr_last_name']}",
-      address1: tavern['addr_line_1'],
-      address2: tavern['addr_line_2'],
-      city: tavern['addr_city'],
-      state_name: tavern['addr_state'],
+      name: "#{tavern['addr_first_name']&.first} #{tavern['addr_last_name']&.first}",
+      address1: tavern['addr_line_1']&.first,
+      address2: tavern['addr_line_2']&.first,
+      city: tavern['addr_city']&.first,
+      state_name: tavern['addr_state']&.first,
       state_code:,
-      zip: tavern['addr_zip'],
-      country_name: tavern['addr_country'],
+      zip: tavern['addr_zip']&.first,
+      country_name: tavern['addr_country']&.first,
       country_code:,
-      email: tavern['addr_email'],
-    },
+      email: tavern['addr_email']&.first,
+    }.compact,
     confirm: true
   }
 end
@@ -154,8 +172,14 @@ module ISO3166
   module CountrySubdivisionMethods
     def find_subdivision_by_any_name(subdivision_str)
       subdivisions.select do |k, v|
-        subdivision_str == k || v.name == subdivision_str || v.translations&.values.include?(subdivision_str) || v.unofficial_names&.include?(subdivision_str)
+        subdivision_str == k || v.name == subdivision_str || v.translations&.values.include?(subdivision_str) || v.unofficial_names&.include?(subdivision_str) || stupid_compare(v.translations&.values, subdivision_str) || v.unofficial_names && stupid_compare(v.unofficial_names, subdivision_str)
       end.values.first
+    end
+    def stupid_compare(arr, val)
+      arr.map { |s| tldc(s)}.include?(val)
+    end
+    def tldc(s)
+      ActiveSupport::Inflector.transliterate(s.strip).downcase
     end
   end
 end
@@ -172,12 +196,20 @@ end
 def country_and_state(country, state)
   _country = ISO3166::Country.find_country_by_any_name(country) || ISO3166::Country.find_country_by_alpha2(country) || ISO3166::Country.find_country_by_alpha3(country)
   raise WhatCountryError, "couldn't parse #{country} as a country!" unless _country
-  _state = _country.find_subdivision_by_any_name(state)
-  raise WhatCountryError, "couldn't parse #{state} as a country!" unless _state
-  { country_code: _country.alpha2, state_code: _state.code }
+  _state = _country.find_subdivision_by_any_name(state)&.code || ('XX' if state == 'xx')
+  raise WhatCountryError, "couldn't parse #{state} as a state!" unless _state
+  { country_code: _country.alpha2, state_code: _state }
 end
 
 @client = Printful::Client.new(access_token: ENV['PRINTFUL_API_TOKEN'], store_id: ENV['PRINTFUL_STORE_ID'])
 
-# @client.orders.create **generate_order(MockTavern.new, expedited: true)
+def tav(id, exp: false)
+  tav = Tavern.find id
+  ord = @client.orders.create **generate_order(tav, expedited: exp)
+  pp ord
+  tav['shirts_ordered_at'] = Time.now
+  tav.save
+  ord
+end
+#
 binding.irb
