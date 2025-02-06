@@ -1,5 +1,5 @@
 <div class="qr-card <%= !ONLY_YSWS_PROJECTS && ship[:in_ysws] && 'in-ysws' %>">
-  <img class="qr-code" src="<%= generate_qr_data_uri("https://hss.hack.club/r/#{ship.id}") %>">
+  <img class="qr-code" src="<%= generate_qr_data_uri("https://hss.hack.club/r/#{ship[:id]}") %>">
   <div class="ship-title" data-width="450"><span class="shrink-to-fit"><%= ship[:title] %></span></div>
   <div class="stats">
     <span>

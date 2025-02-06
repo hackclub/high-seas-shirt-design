@@ -4,7 +4,7 @@ source "https://rubygems.org"
 
 # gem "rails"
 
-gem "norairrecord", "~> 0.2.0"
+gem "norairrecord", "~> 0.3.0"
 
 gem "tilt", "~> 2.6"
 

@@ -100,7 +100,8 @@ def process_ships(person)
         hours: ship['total_hours'].to_i || 0.0,
         deploy_url: ship['deploy_url'],
         title:,
-        in_ysws: ship['has_ysws_submission_id']
+        in_ysws: ship['has_ysws_submission_id'],
+        id: ship.id
       }
     end
   end.values
