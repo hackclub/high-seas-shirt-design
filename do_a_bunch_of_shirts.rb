@@ -15,6 +15,8 @@ def bucky(data, filename)
   $buckyconn.post { |req| req.body = payload }.body
 end
 
+@shirted_people = []
+
 def shirt_a_person(person)
   shirts = generate_shirts(person)
   person['shirt_design'] = nil
@@ -24,10 +26,18 @@ def shirt_a_person(person)
     end
   end
   person['action_generate_shirt_design'] = nil
+  @shirted_people << person
 end
 
-people = Person.where('action_generate_shirt_design')
-puts "#{people.length}"
-people.each { |person| shirt_a_person(person) }
-
-Person.batch_save(people)
+ppl = Person.where('action_generate_shirt_design', max_records: 100)
+puts "#{ppl.length}"
+ppl.each_slice(10) do |people|
+  @shirted_people = []
+  begin
+    people.each { |person| shirt_a_person(person) }
+  rescue Interrupt, Norairrecord::Error
+    Person.batch_save(@shirted_people)
+  end
+  puts "saving"
+  Person.batch_save(@shirted_people)
+end
