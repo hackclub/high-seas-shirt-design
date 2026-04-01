@@ -8,7 +8,7 @@ gem "norairrecord", "~> 0.3.0"
 
 gem "tilt", "~> 2.6"
 
-gem "faraday", "~> 2.12"
+gem "faraday", "~> 2.14"
 gem "faraday-multipart", "~> 1.1"
 
 gem "rqrcode", "~> 2.2"
