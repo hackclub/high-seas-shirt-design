@@ -18,7 +18,7 @@ gem "activesupport", "~> 8.0"
 gem "grover", "~> 1.2"
 
 gem "rackup", "~> 2.2"
-gem "puma", "~> 6.5"
+gem "puma", "~> 7.2"
 gem "grape", "~> 2.2"
 
 gem "concurrent-ruby", "~> 1.3"
